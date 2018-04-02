@@ -10,6 +10,7 @@ private:
 
 public:
 String alive();
+String lightSensor(int value);
 String registerdevice (String name, String server);
 };
 

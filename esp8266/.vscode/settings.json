@@ -2,5 +2,9 @@
     "terminal.integrated.env.linux": {
         "PATH": "/home/root4me/.platformio/penv/bin:/home/root4me/.platformio/penv:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games",
         "PLATFORMIO_CALLER": "vscode"
+    },
+    "files.associations": {
+        "functional": "cpp",
+        "type_traits": "cpp"
     }
 }
