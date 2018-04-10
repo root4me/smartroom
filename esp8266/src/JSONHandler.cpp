@@ -3,6 +3,8 @@
 #include <JSONHandler.h>
 #include <ArduinoJson.h> // Install ArduinoJson library https://arduinojson.org/
 
+#include <Lamp.h>
+
 String JSONHandler::alive()
 {
 
@@ -52,4 +54,25 @@ String JSONHandler::lightSensor(int value)
         root.printTo(retval);
 
         return retval;
+}
+
+String JSONHandler::lampStatus(Lamp& floorLamp)
+{
+        StaticJsonBuffer<50> jsonBuffer;
+        String retval;
+
+        JsonObject& root = jsonBuffer.createObject();
+        if (floorLamp.isSwitchedOn())
+        {
+                root["status"] = "on";
+        }
+        else
+        {
+                root["status"] = "off";
+        }
+
+        root.printTo(retval);
+
+        return retval;
+
 }
