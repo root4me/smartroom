@@ -6,6 +6,8 @@
 
 #include <Lamp.h>
 
+#include <SimpleTimer.h>
+
 // Update SSID and password before uploading to device
 const char *SSID = "SSID";
 const char *PASSWORD = "PASSWORD";
@@ -17,16 +19,28 @@ const char *PASSWORD = "PASSWORD";
 //  Circuit https://github.com/root4me/arduinolab/tree/master/lamp (D1 instead of D3)
 #define RELAY_1_PIN D1
 
+#define MOTION_PIN D2
+
 Lamp floorLamp(RELAY_1_PIN, true);
 
 ESP8266WebServer server(80);
 JSONHandler jsonHandler;
 
+SimpleTimer timer;
+int timerId = 0;
+int light_tolerance = 50;
+long inactivity_timeout = 10000; //milli seconds
+
+// Web server
 void handleroot();
 void handleLightSensor();
 void hanldeLampStatus();
 void hanldeLampOn();
 void hanldeLampOff();
+
+// Handle motion
+void handleMotion();
+void handleTimeOut();
 
 void setup()
 {
@@ -55,11 +69,37 @@ void setup()
 
     Serial.println(WiFi.localIP().toString());
     Serial.println((String)WiFi.localIP());
+
+    pinMode(MOTION_PIN, INPUT);
+    attachInterrupt(digitalPinToInterrupt(MOTION_PIN), handleMotion, CHANGE);
+}
+
+void handleTimeOut()
+{
+    floorLamp.switchOff();
+}
+
+void handleMotion()
+{
+
+    if (digitalRead(MOTION_PIN) == HIGH)
+    {
+        if (analogRead(LDR_PIN) < light_tolerance)
+        {
+            floorLamp.switchOn();
+        }
+    }
+    else if (digitalRead(MOTION_PIN) == LOW)
+    {
+        timer.deleteTimer(timerId);
+        timerId = timer.setTimeout(inactivity_timeout, handleTimeOut);
+    }
 }
 
 void loop()
 {
     server.handleClient();
+    timer.run();
 }
 
 void handleroot()
