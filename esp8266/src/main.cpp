@@ -10,7 +10,7 @@
 
 // Update SSID and password before uploading to device
 const char *SSID = "SSID";
-const char *PASSWORD = "PASSWORD";
+const char *PASSWORD = "PWD";
 
 // Light dependent resistor / photocell pin
 // Circuit link https://github.com/root4me/arduinolab/tree/master/photocell
@@ -28,7 +28,7 @@ JSONHandler jsonHandler;
 
 SimpleTimer timer;
 int timerId = 0;
-int light_tolerance = 50;
+int light_tolerance = 20;
 long inactivity_timeout = 10000; //milli seconds
 
 // Web server
@@ -87,13 +87,16 @@ void handleMotion()
         if (analogRead(LDR_PIN) < light_tolerance)
         {
             floorLamp.switchOn();
+            
+            timer.deleteTimer(timerId);
+            timerId = timer.setTimeout(inactivity_timeout, handleTimeOut);
         }
     }
-    else if (digitalRead(MOTION_PIN) == LOW)
-    {
-        timer.deleteTimer(timerId);
-        timerId = timer.setTimeout(inactivity_timeout, handleTimeOut);
-    }
+    //else if (digitalRead(MOTION_PIN) == LOW)
+    //{
+    //    timer.deleteTimer(timerId);
+    //    timerId = timer.setTimeout(inactivity_timeout, handleTimeOut);
+    //}
 }
 
 void loop()
